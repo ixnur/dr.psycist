@@ -34,8 +34,6 @@ class AdvancedQLearningPsychologicalTherapist:
         """
         current_q_value = self.q_table[state, action]
         max_future_q_value = np.max(self.q_table[next_state, :])
-
-        # Daha sofistike bir Q-table güncelleme stratejisi ekleyin
         new_q_value = self.learning_rate * (reward + self.discount_factor * max_future_q_value - current_q_value)
         self.q_table[state, action] += new_q_value
 
@@ -49,7 +47,7 @@ class AdvancedQLearningPsychologicalTherapist:
         Returns:
             str: Seçilen eylem.
         """
-        # Softmax stratejisi ekleyin
+        #softmaxekleyin
         action_probabilities = np.exp(self.q_table[state, :] / self.exploration_rate)
         action_probabilities /= np.sum(action_probabilities)
         chosen_action = np.random.choice(self.actions, p=action_probabilities)
