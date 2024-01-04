@@ -28,7 +28,7 @@ class dr_psycist:
         y = [item["rahatsizlik"] for item in veri]
         X_text = [self.clean_text(text) for text in X_text]
 
-        # TF-IDF ve MultinomialNB modeli
+        # TF-IDF 
         parametreler = {
             'tfidfvectorizer__ngram_range': [(1, 1), (1, 2), (2, 2)],
             'tfidfvectorizer__use_idf': (True, False),
@@ -42,13 +42,12 @@ class dr_psycist:
         print(f"Eğitim tamamlandı. En iyi parametreler: {grid_search.best_params_}")
         print(f"En iyi çapraz doğrulama skoru: {grid_search.best_score_}")
 
-        # Derin öğrenme modeli
         self.deep_model = self.build_deep_model(X_text, y)
         self.train_deep_model(X_text, y, epochs=5, batch_size=32)
 
     def build_deep_model(self, X, y):
-        max_words = 10000  # Örneğin, en çok kullanılan 10,000 kelimeyi kullanın
-        max_len = 100  # Örneğin, metinlerinizi en fazla 100 kelimeye sınırlayın
+        max_words = 10000 
+        max_len = 100  
 
         tokenizer = Tokenizer(num_words=max_words)
         tokenizer.fit_on_texts(X)
@@ -63,8 +62,8 @@ class dr_psycist:
         return model
 
     def train_deep_model(self, X, y, epochs, batch_size):
-        max_words = 10000  # Örneğin, en çok kullanılan 10,000 kelimeyi kullanın
-        max_len = 100  # Örneğin, metinlerinizi en fazla 100 kelimeye sınırlayın
+        max_words = 10000  
+        max_len = 100 
 
         tokenizer = Tokenizer(num_words=max_words)
         tokenizer.fit_on_texts(X)
@@ -84,10 +83,8 @@ class dr_psycist:
         y = [item["rahatsizlik"] for item in yeni_veri]
         X_text = [self.clean_text(text) for text in X_text]
 
-        # TF-IDF ve MultinomialNB modelini güncelle
+        # TF-IDF & MultinomialNB 
         self.tfidf_model.fit(X_text, y)
-
-        # Derin öğrenme modelini güncelle
         X = pad_sequences(tokenizer.texts_to_sequences(X_text), maxlen=max_len)
         self.deep_model.fit(X, y)
 
@@ -97,30 +94,27 @@ class dr_psycist:
         return X_new
 
     def trymodels(self, RandomForestRegressor, GradientBoostingRegressor, XGBRegressor):
-        # Burada modelleri denemek için kullanılan fonksiyonu ekleyin
+        #fonksiyonu ekle
         pass
 
     def predict(self, text):
-        # Tahmin yaparken her iki modelin çıkışını birleştirin
         tfidf_pred = self.tfidf_model.predict([text])[0]
         deep_pred = self.deep_model.predict(pad_sequences(tokenizer.texts_to_sequences([text]), maxlen=max_len))[0][0]
-        combined_pred = (tfidf_pred + deep_pred) / 2  # İki modelin çıkışını ortalamak
+        combined_pred = (tfidf_pred + deep_pred) / 2 
         return combined_pred
 
-# Veri setinizi yükleyin ve ön işleme adımlarını uygulayın
+
 veri_df = pd.read_csv("dataset.csv")
 veri = veri_df.to_dict('records')
 
-# Psikolog sınıfını oluşturun ve eğitimi başlatın
+
 psikolog = dr_psycist()
 psikolog.eğit(veri)
 
-# Yeni veri ekleyin ve modeli güncelleyin
 yeni_veri = [{"hasta": "Have you ever been smacked by fate?", "hasta_verileri": "NEWDATA", "rahatsizlik": 1}]
 psikolog.modeli_guncelle(yeni_veri)
 print("Yeni veri ile modeli güncellendi.")
 
-# Örnek bir metin için tahmin yapın
-ornek_metin = "How do you feel?"
+ornek_metin = "Nassın eyimin Gardaş?"#değiiştir
 tahmin = psikolog.predict(ornek_metin)
 print(f"Model tahmini: {tahmin}")
